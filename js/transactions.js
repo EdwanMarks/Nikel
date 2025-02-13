@@ -1,96 +1,115 @@
 const myModal = new bootstrap.Modal("#transaction-modal");
-let logged = sessionStorage.getItem("logged");
-const session = localStorage.getItem("session");
-
-let data = {
-  transactions: [],
+let loggedUser = sessionStorage.getItem("logged") || localStorage.getItem("session");
+let userData = {
+  transactions: []
 };
 
-document.getElementById("buttom-logout").addEventListener("click", logout);
+// Elementos DOM
+const logoutButton = document.getElementById("logout-button"); // Corrigido o ID
+const transactionForm = document.getElementById("transaction-form");
+const transactionsList = document.getElementById("transactions-list");
 
-//ADICIONAR LANÇAMENTO
+// Event Listeners
+document.addEventListener("DOMContentLoaded", initApp);
+logoutButton.addEventListener("click", logout);
+transactionForm.addEventListener("submit", handleTransactionSubmit);
 
-document
-  .getElementById("transaction-form")
-  .addEventListener("submit", function (e) {
-    e.preventDefault();
+async function initApp() {
+  try {
+    await checkLogged();
+    getTransactions();
+  } catch (error) {
+    showFeedback(error.message, 'error');
+    logout();
+  }
+}
 
+async function handleTransactionSubmit(e) {
+  e.preventDefault();
+
+  try {
     const value = parseFloat(document.getElementById("value-input").value);
-    const description = document.getElementById("description-input").value;
+    const description = sanitizeInput(document.getElementById("description-input").value);
     const date = document.getElementById("date-input").value;
-    const type = document.querySelector(
-      'input[name="type-input"]:checked'
-    ).value;
+    const type = document.querySelector('input[name="type-input"]:checked').value;
 
-    data.transactions.unshift({
+    // Validações
+    if (isNaN(value) || value <= 0) throw new Error('Valor inválido');
+    if (!description || description.length < 3) throw new Error('Descrição muito curta');
+    if (!date) throw new Error('Data inválida');
+
+    // Adicionar transação
+    userData.transactions.unshift({
       value: value,
       type: type,
       description: description,
-      date: date,
+      date: new Date(date).toISOString().split('T')[0] // Formatar data
     });
 
-    saveData(data);
-    e.target.reset();
+    await saveData();
+    transactionForm.reset();
     myModal.hide();
-
     getTransactions();
+    showFeedback('Lançamento adicionado com sucesso!', 'success');
 
-    alert("Lançamento adicionado com sucesso.");
-  });
-
-checkLogged();
-
-function checkLogged() {
-  if (session) {
-    sessionStorage.setItem("logged", session);
-    logged = session;
+  } catch (error) {
+    showFeedback(error.message, 'error');
   }
-  if (!logged) {
+}
+
+async function checkLogged() {
+  if (!loggedUser) {
     window.location.href = "index.html";
     return;
   }
 
-  const dataUser = localStorage.getItem(logged);
-  if (dataUser) {
-    data = JSON.parse(dataUser);
-  }
-
-  getTransactions();
+  const storedData = localStorage.getItem(loggedUser);
+  if (!storedData) throw new Error('Dados do usuário não encontrados');
+  
+  userData = JSON.parse(storedData);
+  sessionStorage.setItem("logged", loggedUser);
 }
 
 function logout() {
-  sessionStorage.removeItem("logged");
+  sessionStorage.clear();
   localStorage.removeItem("session");
-
   window.location.href = "index.html";
 }
 
 function getTransactions() {
-  const transactions = data.transactions;
-  let transactionsHtml = ``;
-
-  if (transactions.length) {
-    transactions.forEach((item) => {
-      let type = "Entrada";
-
-      if (item.type === "2") {
-        type = "Saída";
-      }
-
-      transactionsHtml += `
-            <tr>
-            <th scope="row">${item.date}</th>
-            <td>${item.value.toFixed(2)}</td>
-            <td>${type}</td>
-            <td>${item.description}</td>
-          </tr>
-          `;
-    });
-  }
-
-  document.getElementById("transactions-list").innerHTML = transactionsHtml;
+  transactionsList.innerHTML = userData.transactions
+    .map(transaction => `
+      <tr>
+        <td>${transaction.date}</td>
+        <td class="${transaction.type === '1' ? 'text-success' : 'text-danger'}">
+          R$ ${transaction.value.toFixed(2)}
+        </td>
+        <td>${transaction.type === '1' ? 'Entrada' : 'Saída'}</td>
+        <td>${transaction.description}</td>
+      </tr>
+    `).join('') || '<tr><td colspan="4">Nenhuma transação registrada</td></tr>';
 }
 
-function saveData(data) {
-  localStorage.setItem(data.login, JSON.stringify(data));
+async function saveData() {
+  try {
+    localStorage.setItem(loggedUser, JSON.stringify(userData));
+  } catch (error) {
+    throw new Error('Erro ao salvar dados: ' + error.message);
+  }
+}
+
+// Funções auxiliares
+function sanitizeInput(input) {
+  return input.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function showFeedback(message, type = 'success') {
+  const alert = document.createElement('div');
+  alert.className = `alert alert-${type} alert-dismissible fade show fixed-top`;
+  alert.innerHTML = `
+    ${message}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  `;
+  document.body.prepend(alert);
+  setTimeout(() => alert.remove(), 5000);
 }
