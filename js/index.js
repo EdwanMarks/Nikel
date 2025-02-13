@@ -1,91 +1,110 @@
-const myModal = new bootstrap.Modal("#register-modal");
-let logged = sessionStorage.getItem("logged");
-const session = localStorage.getItem("session");
+(function() {
+    const authModal = new bootstrap.Modal("#register-modal");
+    const SESSION_KEY = 'financial_session';
+    const MIN_PASSWORD_LENGTH = 8;
 
-checkLogged();
-
-//LOGIN NO SISTEMA
-document.getElementById("login-form").addEventListener("submit", function (e) {
-  e.preventDefault();
-
-  const email = document.getElementById("email-input").value;
-  const password = document.getElementById("password-input").value;
-  const checkSession = document.getElementById("session-check").checked;
-
-  const account = getAccount(email);
-
-  if (!account) {
-    alert("Ops! Verifique o usuário ou a senha.");
-    return;
-  }
-  if (account) {
-    if (account.password != password) {
-      alert("Opps! Verifique o usuário ou a senha.");
-      return;
+    // Verificar autenticação
+    function checkAuth() {
+        const session = JSON.parse(localStorage.getItem(SESSION_KEY));
+        if (session?.token && session.expires > Date.now()) {
+            window.location.href = "home.html";
+        }
     }
 
-    saveSession(email, checkSession);
+    // Gerar token de sessão
+    function generateSessionToken() {
+        return crypto.randomUUID();
+    }
 
-    window.location.href = "home.html";
-  }
-});
+    // Validar e-mail
+    function isValidEmail(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
 
-//CRIAR CONTA
-document.getElementById("create-form").addEventListener("submit", function (e) {
-  e.preventDefault();
+    // Validar senha
+    function isStrongPassword(password) {
+        return password.length >= MIN_PASSWORD_LENGTH &&
+               /[A-Z]/.test(password) &&
+               /[0-9]/.test(password);
+    }
 
-  const email = document.getElementById("email-create-input").value;
-  const password = document.getElementById("password-create-input").value;
+    // Criptografar dados (simulado para exemplo)
+    function secureEncrypt(data) {
+        return btoa(unescape(encodeURIComponent(JSON.stringify(data)));
+    }
 
-  if (email.length < 5) {
-    alert("Preencha o campo com um e-mail válido");
-    return;
-  }
+    document.getElementById("login-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        
+        const email = document.getElementById("email-input").value.trim();
+        const password = document.getElementById("password-input").value;
+        const rememberMe = document.getElementById("session-check").checked;
 
-  if (password.length < 4) {
-    alert("Preencha a senha com no mínimo 4 dígitos.");
-    return;
-  }
+        try {
+            if (!isValidEmail(email)) throw new Error('E-mail inválido');
+            if (!password) throw new Error('Senha obrigatória');
 
-  saveAccount({
-    login: email,
-    password: password,
-    transactions: [],
-  });
+            const account = localStorage.getItem(email);
+            if (!account) throw new Error('Credenciais inválidas');
 
-  myModal.hide();
+            const userData = JSON.parse(account);
+            if (userData.password !== password) throw new Error('Credenciais inválidas');
 
-  alert("Conta criada com sucesso!");
-});
+            // Criar sessão
+            const sessionData = {
+                token: generateSessionToken(),
+                expires: rememberMe ? Date.now() + 30 * 24 * 60 * 60 * 1000 : Date.now() + 24 * 60 * 60 * 1000
+            };
 
-function checkLogged() {
-  if (session) {
-    sessionStorage.setItem("logged", session);
-    logged = session;
-  }
-  if (logged) {
-    window.location.href = "home.html";
-  }
-}
+            localStorage.setItem(SESSION_KEY, JSON.stringify(sessionData));
+            sessionStorage.setItem('currentUser', secureEncrypt(userData));
 
-function saveAccount(data) {
-  localStorage.setItem(data.login, JSON.stringify(data));
-}
+            window.location.href = "home.html";
+            
+        } catch (error) {
+            showFeedback(error.message, 'error');
+        }
+    });
 
-function saveSession(data, saveSession) {
-  if (saveSession) {
-    localStorage.setItem("session", data);
-  }
+    document.getElementById("create-form").addEventListener("submit", (e) => {
+        e.preventDefault();
+        
+        const email = document.getElementById("email-create-input").value.trim();
+        const password = document.getElementById("password-create-input").value;
 
-  sessionStorage.setItem("logged", data);
-}
+        try {
+            if (!isValidEmail(email)) throw new Error('Formato de e-mail inválido');
+            if (localStorage.getItem(email)) throw new Error('E-mail já cadastrado');
+            if (!isStrongPassword(password)) throw new Error(`Senha deve ter ${MIN_PASSWORD_LENGTH}+ caracteres com letras e números`);
 
-function getAccount(key) {
-  const account = localStorage.getItem(key);
+            const userData = {
+                login: email,
+                password: password, // Em aplicação real, usar bcrypt
+                transactions: [],
+                createdAt: new Date().toISOString()
+            };
 
-  if (account) {
-    return JSON.parse(account);
-  }
+            localStorage.setItem(email, JSON.stringify(userData));
+            authModal.hide();
+            showFeedback('Conta criada com sucesso!', 'success');
 
-  return "";
-}
+        } catch (error) {
+            showFeedback(error.message, 'error');
+        }
+    });
+
+    // Sistema de feedback visual
+    function showFeedback(message, type = 'info') {
+        const feedbackEl = document.createElement('div');
+        feedbackEl.className = `alert alert-${type} fixed-top fade show`;
+        feedbackEl.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        
+        document.body.prepend(feedbackEl);
+        setTimeout(() => feedbackEl.remove(), 5000);
+    }
+
+    checkAuth();
+})();
