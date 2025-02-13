@@ -1,205 +1,187 @@
 <!DOCTYPE html>
-<html lang="pt-br">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Nikel</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx"
-      crossorigin="anonymous"
-    />
-    <link rel="stylesheet" href="./css/styles.css" />
-  </head>
-  <body id="login">
-    <main>
-      <div class="container">
-        <div class="row vh-100">
-          <div class="col d-flex justify-content-center my-5 flex-column">
-            <div class="text-login">
-              <p>Organize suas finanças de uma forma fácil.</p>
-              <p>Controle seu dinheiro e investimentos.</p>
-              <p>Economize e atinja seus objetivos.</p>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Nikel - Sua plataforma de gestão financeira pessoal">
+    <title>Nikel - Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="./css/styles.css">
+</head>
+<body id="login-page">
+    <main class="container-fluid">
+        <div class="row min-vh-100 g-0">
+            <!-- Seção de Apresentação -->
+            <div class="col-12 col-lg-6 presentation-section d-flex flex-column justify-content-between">
+                <div class="p-4 p-lg-5">
+                    <h2 class="visually-hidden">Benefícios da Plataforma</h2>
+                    <ul class="benefits-list list-unstyled">
+                        <li class="mb-4">
+                            <h3 class="h4 mb-2">Organização Financeira Simplificada</h3>
+                            <p class="mb-0">Controle suas finanças de forma intuitiva e eficiente</p>
+                        </li>
+                        <li class="mb-4">
+                            <h3 class="h4 mb-2">Gestão Completa de Investimentos</h3>
+                            <p class="mb-0">Acompanhe e otimize seus investimentos em um só lugar</p>
+                        </li>
+                        <li>
+                            <h3 class="h4 mb-2">Economia Inteligente</h3>
+                            <p class="mb-0">Alcance seus objetivos financeiros com planejamento estratégico</p>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="text-center py-4">
+                    <img src="./assets/images/pocket.png" 
+                         alt="Ilustração de carteira com moedas" 
+                         class="img-fluid"
+                         loading="lazy"
+                         width="300">
+                    <img src="./assets/images/coins.png" 
+                         alt="Ilustração de moedas" 
+                         class="img-fluid d-none d-md-inline-block coins-decoration"
+                         loading="lazy"
+                         width="150">
+                </div>
             </div>
-            <div class="text-center">
-              <img
-                src="./assets/images/pocket.png"
-                alt="image pocket"
-                class="img-fluid"
-              />
-              <img
-                src="./assets/images/coins.png"
-                alt="image coins"
-                class="img-fluid d-none d-md-inline coins"
-              />
+
+            <!-- Seção de Login -->
+            <div class="col-12 col-lg-6 bg-light d-flex align-items-center py-5">
+                <div class="w-100 px-3" style="max-width: 480px;">
+                    <div class="text-center mb-5">
+                        <img src="./assets/images/nikel-logo.png" 
+                             alt="Logo Nikel" 
+                             class="brand-logo img-fluid"
+                             width="200">
+                    </div>
+
+                    <form id="login-form" novalidate>
+                        <div class="mb-4">
+                            <label for="email-input" class="form-label fw-bold">E-mail</label>
+                            <input type="email" 
+                                   class="form-control form-control-lg" 
+                                   id="email-input" 
+                                   required
+                                   autocomplete="email"
+                                   aria-describedby="emailHelp">
+                            <div id="emailHelp" class="form-text mt-2">
+                                Utilize o mesmo e-mail cadastrado na plataforma
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="password-input" class="form-label fw-bold">Senha</label>
+                            <input type="password" 
+                                   class="form-control form-control-lg" 
+                                   id="password-input" 
+                                   required
+                                   minlength="8"
+                                   autocomplete="current-password">
+                        </div>
+
+                        <div class="mb-4 form-check">
+                            <input type="checkbox" 
+                                   class="form-check-input" 
+                                   id="session-check">
+                            <label class="form-check-label" for="session-check">
+                                Manter sessão ativa
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 py-3 fs-5">
+                            Acessar Plataforma
+                        </button>
+                    </form>
+
+                    <div class="text-center mt-4">
+                        <button class="btn btn-link text-decoration-none" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#register-modal"
+                                aria-label="Criar nova conta">
+                            Não possui conta? <span class="text-primary">Registre-se agora</span>
+                        </button>
+                    </div>
+
+                    <div class="partners-section mt-5 pt-4">
+                        <div class="text-center mb-4">
+                            <p class="text-muted mb-2">Parceiros estratégicos</p>
+                            <div class="d-flex justify-content-center gap-4">
+                                <img src="./assets/images/codai-logo.png" 
+                                     alt="Logo Codaí" 
+                                     class="partner-logo img-fluid"
+                                     width="100">
+                                <img src="./assets/images/growdev-logo.png" 
+                                     alt="Logo Growdev" 
+                                     class="partner-logo img-fluid"
+                                     width="100">
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
-          <div class="col d-flex my-5 justify-content-center flex-column">
-            <div class="container">
-              <div class="row">
-                <div class="col">
-                  <div class="text-center mb-3">
-                    <img
-                      src="./assets/images/nikel-logo.png"
-                      alt="logo nikel"
-                      class="img-fluid"
-                    />
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col">
-                  <form id="login-form">
-                    <div class="mb-3">
-                      <label for="email-input" class="form-label">E-mail</label>
-                      <input
-                        type="email"
-                        class="form-control"
-                        id="email-input"
-                        aria-describedby="emailHelp"
-                      />
-                      <div id="emailHelp" class="form-text">
-                        Utilize seu e-mail para realizar o login.
-                      </div>
-                    </div>
-                    <div class="mb-3">
-                      <label for="password-input" class="form-label"
-                        >Senha</label
-                      >
-                      <input
-                        type="password"
-                        class="form-control"
-                        id="password-input"
-                      />
-                    </div>
-                    <div class="mb-3 form-check">
-                      <input
-                        type="checkbox"
-                        class="form-check-input"
-                        id="session-check"
-                      />
-                      <label
-                        class="form-check-label form-text"
-                        for="session-check"
-                        >Permanecer conectado</label
-                      >
-                    </div>
-                    <button type="submit" class="btn button-login">
-                      Entrar
-                    </button>
-                  </form>
-                </div>
-              </div>
-              <div class="row">
-                <div class="co">
-                  <p
-                    id="link-conta"
-                    class="text-center mt-2 form-text"
-                    data-bs-toggle="modal"
-                    data-bs-target="#register-modal"
-                  >
-                    Ainda não tem conta?
-                    <span class="link-default">Criar uma conta</span>
-                  </p>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col">
-                  <div class="text-center mt-5">
-                    <img
-                      src="./assets/images/codai-logo.png"
-                      alt="logo Codaí"
-                    />
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col">
-                  <div class="text-center">
-                    <img
-                      src="./assets/images/growdev-logo.png"
-                      alt="logo GrowDev"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
-      </div>
-      <!-- Modal -->
-      <div
-        class="modal fade"
-        id="register-modal"
-        tabindex="-1"
-        aria-labelledby="exampleModalLabel"
-        aria-hidden="true"
-      >
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLabel">Crie sua conta</h5>
-              <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
-            </div>
-            <form id="create-form">
-              <div class="mb-3">
-                <label for="email-create-input" class="form-label"
-                  >E-mail</label
-                >
-                <input
-                  type="email"
-                  class="form-control"
-                  id="email-create-input"
-                  aria-describedby="emailHelp"
-                  required
-                />
-                <div id="emailHelp1" class="form-text">
-                  Utilize seu e-mail para criar a conta.
-                </div>
-              </div>
-              <div class="mb-3">
-                <label for="password-create-input" class="form-label"
-                  >Senha</label
-                >
-                <input
-                  type="password"
-                  class="form-control"
-                  id="password-create-input"
-                  required
-                />
-              </div>
-              <div id="emailHelp2" class="form-text">
-                Utilize uma senha fácil de lembrar, e anote para não esquecer
-              </div>
-              <div class="modal-footer">
-                <button
-                  type="button"
-                  class="btn btn-secondary button-cancel"
-                  data-bs-dismiss="modal"
-                >
-                  Cancelar
-                </button>
-                <button type="submit" class="btn button-default">
-                  Criar conta
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
     </main>
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"
-      integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa"
-      crossorigin="anonymous"
-    ></script>
-    <script src="./js/index.js"></script>
-  </body>
+
+    <!-- Modal de Registro -->
+    <div class="modal fade" id="register-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title h5">Criar Nova Conta</h2>
+                    <button type="button" 
+                            class="btn-close" 
+                            data-bs-dismiss="modal" 
+                            aria-label="Fechar"></button>
+                </div>
+                
+                <form id="registration-form" novalidate>
+                    <div class="modal-body">
+                        <div class="mb-4">
+                            <label for="email-create-input" class="form-label">E-mail</label>
+                            <input type="email" 
+                                   class="form-control" 
+                                   id="email-create-input" 
+                                   required
+                                   autocomplete="email">
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="password-create-input" class="form-label">Senha</label>
+                            <input type="password" 
+                                   class="form-control" 
+                                   id="password-create-input" 
+                                   required
+                                   minlength="8"
+                                   autocomplete="new-password">
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="password-confirm-input" class="form-label">Confirme a Senha</label>
+                            <input type="password" 
+                                   class="form-control" 
+                                   id="password-confirm-input" 
+                                   required
+                                   minlength="8">
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" 
+                                class="btn btn-outline-secondary" 
+                                data-bs-dismiss="modal">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            Criar Conta
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="./js/auth.js" type="module"></script>
+</body>
 </html>
