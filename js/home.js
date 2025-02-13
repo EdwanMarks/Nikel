@@ -1,170 +1,151 @@
 const myModal = new bootstrap.Modal("#transaction-modal");
-let logged = sessionStorage.getItem("logged");
-const session = localStorage.getItem("session");
-
+const loggedUser = sessionStorage.getItem("logged") || localStorage.getItem("session");
 let data = {
-  transactions: [],
+  transactions: []
 };
 
-document.getElementById("buttom-logout").addEventListener("click", logout);
-document
-  .getElementById("transaction-button")
-  .addEventListener("click", function () {
+// Validação de DOM carregado
+document.addEventListener("DOMContentLoaded", () => {
+  checkLogged();
+  
+  document.getElementById("button-logout").addEventListener("click", logout); // Corrigido ID do botão
+  document.getElementById("transaction-button").addEventListener("click", () => {
     window.location.href = "transactions.html";
   });
 
-//ADICIONAR LANÇAMENTO
-document
-  .getElementById("transaction-form")
-  .addEventListener("submit", function (e) {
-    e.preventDefault();
+  // Adicionar Lançamento
+  document.getElementById("transaction-form").addEventListener("submit", handleTransactionSubmit);
+});
 
-    const value = parseFloat(document.getElementById("value-input").value);
-    const description = document.getElementById("description-input").value;
-    const date = document.getElementById("date-input").value;
-    const type = document.querySelector(
-      'input[name="type-input"]:checked'
-    ).value;
+function handleTransactionSubmit(e) {
+  e.preventDefault();
 
-    data.transactions.unshift({
-      value: value,
-      type: type,
-      description: description,
-      date: date,
-    });
+  const valueInput = document.getElementById("value-input");
+  const descriptionInput = document.getElementById("description-input");
+  const dateInput = document.getElementById("date-input");
 
-    saveData(data);
-    e.target.reset();
-    myModal.hide();
+  // Validação dos campos
+  const value = parseFloat(valueInput.value);
+  if (isNaN(value) {
+    showError("Valor inválido");
+    return;
+  }
 
-    getCashIn();
-    getCashOut();
-    getTotal();
+  const description = sanitizeInput(descriptionInput.value);
+  const date = new Date(dateInput.value);
+  if (isNaN(date.getTime())) {
+    showError("Data inválida");
+    return;
+  }
 
-    alert("Lançamento adicionado com sucesso.");
+  const type = document.querySelector('input[name="type-input"]:checked').value;
+
+  data.transactions.unshift({
+    value: value,
+    type: type,
+    description: description,
+    date: dateInput.value // Mantém o formato original
   });
 
-checkLogged();
+  saveData(data);
+  e.target.reset();
+  myModal.hide();
+
+  updateDashboard();
+  showSuccess("Lançamento adicionado com sucesso!");
+}
 
 function checkLogged() {
-  if (session) {
-    sessionStorage.setItem("logged", session);
-    logged = session;
-  }
-  if (!logged) {
+  if (!loggedUser) {
     window.location.href = "index.html";
     return;
   }
 
-  const dataUser = localStorage.getItem(logged);
-  if (dataUser) {
-    data = JSON.parse(dataUser);
+  const storedData = localStorage.getItem(loggedUser);
+  if (storedData) {
+    try {
+      data = JSON.parse(storedData);
+    } catch (error) {
+      console.error("Erro ao carregar dados:", error);
+      logout();
+    }
   }
-  getCashIn();
-  getCashOut();
-  getTotal();
+  updateDashboard();
 }
 
 function logout() {
   sessionStorage.removeItem("logged");
   localStorage.removeItem("session");
-
   window.location.href = "index.html";
 }
 
+function updateDashboard() {
+  getCashIn();
+  getCashOut();
+  getTotal();
+}
+
 function getCashIn() {
-  const transactions = data.transactions;
-
-  const cashIn = transactions.filter((item) => item.type === "1");
-
-  if (cashIn.length) {
-    let cashInHtml = ``;
-    let limit = 0;
-
-    if (cashIn.length > 5) {
-      limit = 5;
-    } else {
-      limit = cashIn.length;
-    }
-
-    for (let index = 0; index < limit; index++) {
-      cashInHtml += `
-        <div class="row mb-4">
-        <div class="col-12">
-            <h3 class="fs-2">R$ ${cashIn[index].value.toFixed(2)}</h3>
-            <div class="container p-0">
-                <div class="row">
-                    <div class="col-12 col-md-8">${
-                      cashIn[index].description
-                    }</p>
-                    </div>
-                    <div class="col-12 col-md-3 d-flex justify-content-end">
-                        ${cashIn[index].date}
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    `;
-    }
-
-    document.getElementById("cash-in-list").innerHTML = cashInHtml;
-  }
+  renderTransactionList("1", "cash-in-list");
 }
 
 function getCashOut() {
-  const transactions = data.transactions;
+  renderTransactionList("2", "cash-out-list");
+}
 
-  const cashIn = transactions.filter((item) => item.type === "2");
+function renderTransactionList(type, elementId) {
+  const transactions = data.transactions
+    .filter(item => item.type === type)
+    .slice(0, 5); // Limite de 5 itens
 
-  if (cashIn.length) {
-    let cashInHtml = ``;
-    let limit = 0;
-
-    if (cashIn.length > 5) {
-      limit = 5;
-    } else {
-      limit = cashIn.length;
-    }
-
-    for (let index = 0; index < limit; index++) {
-      cashInHtml += `
+  const container = document.getElementById(elementId);
+  container.innerHTML = transactions.length > 0 
+    ? transactions.map(transaction => `
         <div class="row mb-4">
-        <div class="col-12">
-            <h3 class="fs-2">R$ ${cashIn[index].value.toFixed(2)}</h3>
+          <div class="col-12">
+            <h3 class="fs-2">R$ ${transaction.value.toFixed(2)}</h3>
             <div class="container p-0">
-                <div class="row">
-                    <div class="col-12 col-md-8">${
-                      cashIn[index].description
-                    }</p>
-                    </div>
-                    <div class="col-12 col-md-3 d-flex justify-content-end">
-                        ${cashIn[index].date}
-                    </div>
+              <div class="row">
+                <div class="col-12 col-md-8">${sanitizeInput(transaction.description)}</div>
+                <div class="col-12 col-md-3 d-flex justify-content-end">
+                  ${transaction.date}
                 </div>
+              </div>
             </div>
+          </div>
         </div>
-    </div>
-    `;
-    }
-
-    document.getElementById("cash-out-list").innerHTML = cashInHtml;
-  }
+      `).join("")
+    : `<div class="text-muted">Nenhuma transação encontrada</div>`;
 }
 
 function getTotal() {
-  const transactions = data.transactions;
-  let total = 0;
-  transactions.forEach((item) => {
-    if (item.type === "1") {
-      total += item.value;
-    } else {
-      total -= item.value;
-    }
-  });
-  document.getElementById("total").innerHTML = `R$ ${total.toFixed(2)}`;
+  const total = data.transactions.reduce((acc, item) => {
+    return item.type === "1" ? acc + item.value : acc - item.value;
+  }, 0);
+  
+  document.getElementById("total").textContent = `R$ ${total.toFixed(2)}`;
 }
 
-function saveData(data) {
-  localStorage.setItem(data.login, JSON.stringify(data));
+function saveData() {
+  try {
+    localStorage.setItem(loggedUser, JSON.stringify(data));
+  } catch (error) {
+    console.error("Erro ao salvar dados:", error);
+    showError("Erro ao salvar os dados. Tente novamente.");
+  }
+}
+
+// Funções auxiliares de segurança
+function sanitizeInput(input) {
+  const div = document.createElement("div");
+  div.textContent = input;
+  return div.innerHTML;
+}
+
+function showError(message) {
+  alert(`Erro: ${message}`);
+}
+
+function showSuccess(message) {
+  alert(`Sucesso: ${message}`);
 }
